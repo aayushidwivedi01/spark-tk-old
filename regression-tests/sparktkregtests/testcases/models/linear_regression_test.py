@@ -19,6 +19,7 @@ class LinearRegression(sparktk_test.SparkTKTestCase):
 
         self.frame = self.context.frame.import_csv(
             dataset, schema=schema)
+	print self.frame.download(self.frame.row_count).values.tolist()
 
     @unittest.skip("")
     def test_model_publish(self):
@@ -29,7 +30,7 @@ class LinearRegression(sparktk_test.SparkTKTestCase):
         self.assertIn("hdfs", model_path)
         self.assertIn("tar", model_path)
 
-    @unittest.skip("")
+    #@unittest.skip("")
     def test_model_test(self):
         """Test test functionality"""
         model = self.context.models.regression.linear_regression_model.train(
