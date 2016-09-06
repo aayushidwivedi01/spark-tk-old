@@ -12,5 +12,5 @@ def gen_data(coeffs, num_rows, width):
             print "{0},{1}".format(','.join(map(str, x)), str(vals[i]))
 
 if __name__ == '__main__':
-    cf = coeffs(100)
-    gen_data(cf, 1000, 5)
+    cf = coeffs(4)
+    gen_data(cf, 1000, 3)
