@@ -121,6 +121,7 @@ class PrincipalComponent(sparktk_test.SparkTKTestCase):
             atol=1e-04), True)
 
     @unittest.skip("bug:predicted values differ")
+
     def test_pca_predict(self):
         """Test the train functionality"""
         pca_model = self.context.models.dimreduction.pca.train(
