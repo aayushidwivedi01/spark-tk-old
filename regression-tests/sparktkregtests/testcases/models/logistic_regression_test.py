@@ -32,7 +32,7 @@ class LogisticRegression(sparktk_test.SparkTKTestCase):
             self.binomial_frame,
             ["vec0", "vec1", "vec2", "vec3", "vec4"])
         frame = self.binomial_frame.copy(["actual", "predicted_label"])
-        labels = frame.download(frame.row_count)
+        labels = frame.download(frame.count())
         for _, row in labels.iterrows():
             self.assertEqual(row["actual"], row["predicted_label"])
 
@@ -98,14 +98,6 @@ class LogisticRegression(sparktk_test.SparkTKTestCase):
             log_model = self.context.models.classification.logistic_regression.train(
                 self.binomial_frame, ["vec0", "vec1", "vec2", "vec3", "vec4"],
                 7, num_classes=2)
-
-    @unittest.skip("current impl does not raise exception")
-    def test_incorrect_num_classes(self):
-        """test wrong num_classes type in train"""
-        with self.assertRaises(Exception):
-            log_model = self.context.models.classification.logistic_regression.train(
-                self.binomial_frame, ["vec0", "vec1", "vec2", "vec3", "vec4"],
-                'res', num_classes=7)
 
     def test_bad_optimizer_type(self):
         """test invalid optimizer type train"""
@@ -246,7 +238,7 @@ class LogisticRegression(sparktk_test.SparkTKTestCase):
     def test_step_size_type(self):
         """test invalid step size type"""
         with self.assertRaisesRegexp(
-                Exception, "Method train.* does not exist"):
+                Exception, "could not convert string to float: ERR"):
             log_model = self.context.models.classification.logistic_regression.train(
                 self.binomial_frame, ["vec0", "vec1", "vec2", "vec3", "vec4"],
                 "res", step_size="ERR")
@@ -262,19 +254,19 @@ class LogisticRegression(sparktk_test.SparkTKTestCase):
 
         tp_f = self.binomial_frame.copy()
         tp_f.filter(lambda x: x['res'] == 1 and x['actual'] == 1)
-        tp = float(tp_f.row_count)
+        tp = float(tp_f.count())
 
         tn_f = self.binomial_frame.copy()
         tn_f.filter(lambda x: x['res'] == 0 and x['actual'] == 0)
-        tn = float(tn_f.row_count)
+        tn = float(tn_f.count())
 
         fp_f = self.binomial_frame.copy()
         fp_f.filter(lambda x: x['res'] == 0 and x['actual'] == 1)
-        fp = float(fp_f.row_count)
+        fp = float(fp_f.count())
 
         fn_f = self.binomial_frame.copy()
         fn_f.filter(lambda x: x['res'] == 1 and x['actual'] == 0)
-        fn = float(fn_f.row_count)
+        fn = float(fn_f.count())
 
         # manually build the confusion matrix and derivative properties
         precision = tp/(tp+fp)
@@ -306,7 +298,7 @@ class LogisticRegression(sparktk_test.SparkTKTestCase):
         """test logistic regression train with sgd"""
         log_model = self.context.models.classification.logistic_regression.train(
             self.binomial_frame, ["vec0", "vec1", "vec2", "vec3", "vec4"],
-            "res", num_classes=2, optimizer="SGD", step_size=30.0)
+            "res", num_classes=2, optimizer="SGD", step_size=30)
         self._standard_summary(log_model.training_summary, False)
 
     def test_logistic_regression_train_count_column(self):
@@ -424,7 +416,7 @@ class LogisticRegression(sparktk_test.SparkTKTestCase):
 
             #covariance matrix as in log_model summary
             summ_cov = summary.covariance_matrix.take(
-                summary.covariance_matrix.row_count).data
+                summary.covariance_matrix.count()).data
 
             #compare all corresponding values in both matrices
             for (r_list, summ_list) in zip(r_cov, summ_cov):
