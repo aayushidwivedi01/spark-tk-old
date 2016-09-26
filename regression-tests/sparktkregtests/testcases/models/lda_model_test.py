@@ -55,7 +55,7 @@ class LDAModelTest(sparktk_test.SparkTKTestCase):
         #name = self.get_a_name(self.prefix)
         lda_model = self.context.models.clustering.lda.train(
             self.lda_frame, 'paper', 'word', 'count', num_topics=5,
-            max_iterations=150, alpha=[-1.0], check_point_interval=1)
+            max_iterations=50, alpha=[-1.0], check_point_interval=1)
         
         self._confirm_model_valid(lda_model)
 
@@ -68,7 +68,7 @@ class LDAModelTest(sparktk_test.SparkTKTestCase):
 
         lda_model = self.context.models.clustering.lda.train(
             self.lda_frame, 'paper', 'word', 'count32', num_topics=5,
-            max_iterations=150, random_seed=5, alpha=-1.0, check_point_interval=1)
+            max_iterations=50, random_seed=5, alpha=-1.0, check_point_interval=1)
 
         self._confirm_model_valid(lda_model)
 
@@ -81,7 +81,7 @@ class LDAModelTest(sparktk_test.SparkTKTestCase):
 
         lda_model = self.context.models.clustering.lda.train(
             self.lda_frame, 'paper', 'word', 'count32', num_topics=5,
-            max_iterations=150, random_seed=5, alpha=[-1.0], check_point_interval=1)
+            max_iterations=50, random_seed=5, alpha=[-1.0], check_point_interval=1)
 
         predict_vals1 = lda_model.predict(
             ['word-0-0', 'word-1-0', 'word-2-0', 'word-3-0', 'word-4-0'])["topics_given_doc"]
@@ -99,15 +99,15 @@ class LDAModelTest(sparktk_test.SparkTKTestCase):
         word_topic_res = model.word_given_topics_frame
         topic_words_res = model.topics_given_word_frame
         topic_doc_res = model.topics_given_doc_frame
-        words = word_topic_res.take(word_topic_res.row_count).data
-        topics = topic_words_res.take(topic_words_res.row_count).data
-        docs = topic_doc_res.take(topic_doc_res.row_count).data
+        words = word_topic_res.take(word_topic_res.count()).data
+        topics = topic_words_res.take(topic_words_res.count()).data
+        docs = topic_doc_res.take(topic_doc_res.count()).data
 
         baseline_words = filter(lambda x: x[0][-1] != '-', words)
         base_topics = filter(lambda x: x[0][-1] != '-', topics)
 
         # get the baseline values
-        all_rows = self.lda_frame.take(self.lda_frame.row_count).data
+        all_rows = self.lda_frame.take(self.lda_frame.count()).data
 
         # filter out the common words and data lines
         baseline_rows = filter(lambda x: x[3] != "-1", all_rows)
@@ -228,7 +228,7 @@ class LDAModelTest(sparktk_test.SparkTKTestCase):
         """Test training for more iterations."""
         lda_model = self.context.models.clustering.lda.train(
             self.lda_frame, 'paper', 'word', 'count',
-            num_topics=5, max_iterations=130, random_seed=5, check_point_interval=1)
+            num_topics=5, max_iterations=30, random_seed=5, check_point_interval=1)
         path = lda_model.publish()
         self.assertIn("hdfs", path)
         self.assertIn("tar", path)
@@ -253,13 +253,13 @@ class LDAModelTest(sparktk_test.SparkTKTestCase):
 
         # test the lists are completely uniform (as expected)
         word_report = lda_model.word_given_topics_frame
-        words = word_report.take(word_report.row_count).data
+        words = word_report.take(word_report.count()).data
 
         doc_results = lda_model.topics_given_doc_frame
-        docs = doc_results.take(word_report.row_count).data
+        docs = doc_results.take(word_report.count()).data
 
         topic_results = lda_model.topics_given_word_frame
-        topics = topic_results.take(word_report.row_count).data
+        topics = topic_results.take(word_report.count()).data
 
         doc_split = map(lambda x: map(float, x[1]), docs)
 
