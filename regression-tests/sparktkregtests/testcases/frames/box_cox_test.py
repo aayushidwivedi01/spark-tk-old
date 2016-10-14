@@ -10,8 +10,9 @@ class BoxCoxTest(sparktk_test.SparkTKTestCase):
         """Build test frame"""
         super(BoxCoxTest, self).setUp()
 
-        dataset = [[5.8813080107727425], [8.9771372790941797], [8.9153072947470804],
-                   [8.1583747730768401], [0.35889585616853292]]
+        dataset =\
+            [[5.8813080107727425], [8.9771372790941797], [8.9153072947470804],
+            [8.1583747730768401], [0.35889585616853292]]
         schema = [("y", float)]
 
         self.frame = self.context.frame.create(dataset, schema=schema)
@@ -21,8 +22,9 @@ class BoxCoxTest(sparktk_test.SparkTKTestCase):
         self.frame.box_cox("y")
 
         actual = self.frame.to_pandas()["y_lambda_0.0"].tolist()
-        expected = [1.7717791879837133, 2.1946810429706676,
-                    2.1877697201262163, 2.0990449791729704, -1.0247230268174008]
+        expected =\
+            [1.7717791879837133, 2.1946810429706676,
+            2.1877697201262163, 2.0990449791729704, -1.0247230268174008]
         self.assertItemsEqual(actual, expected)
 
     def test_lambda(self):
@@ -30,30 +32,35 @@ class BoxCoxTest(sparktk_test.SparkTKTestCase):
         self.frame.box_cox("y", 0.3)
         
         actual = self.frame.to_pandas()["y_lambda_0.3"].tolist()
-        expected = [2.3384668540844573, 3.1056915770236082,
-                    3.0923547540771801, 2.9235756971904037, -0.88218677941017198]
+        expected =\
+            [2.3384668540844573, 3.1056915770236082,
+            3.0923547540771801, 2.9235756971904037, -0.88218677941017198]
         self.assertItemsEqual(actual, expected)
 
     def test_reverse_default(self):
         """ Test reverse transform for default lambda = 0 """
         self.frame.box_cox("y")
-        self.frame.reverse_box_cox("y_lambda_0.0", box_cox_column_name="reverse")
+        self.frame.reverse_box_cox("y_lambda_0.0",
+            reverse_box_cox_column_name="reverse")
 
         actual = self.frame.to_pandas()["reverse"].tolist()
-        expected = [5.8813080107727425, 8.9771372790941815,
-                    8.9153072947470804, 8.1583747730768401, 0.35889585616853298]
+        expected =\
+            [5.8813080107727425, 8.9771372790941815,
+            8.9153072947470804, 8.1583747730768401, 0.35889585616853298]
 
         self.assertItemsEqual(actual, expected)
 
     def test_reverse_lambda(self):
         """ Test reverse transform for lambda = 0.3 """
         self.frame.box_cox("y", 0.3)
-        self.frame.reverse_box_cox("y_lambda_0.3", 0.3, box_cox_column_name="reverse")
+        self.frame.reverse_box_cox("y_lambda_0.3", 0.3,
+            reverse_box_cox_column_name="reverse")
 
         actual = self.frame.to_pandas()["reverse"].tolist()
-        expected = [5.8813080107727442, 8.9771372790941797,
-                    8.9153072947470822, 8.1583747730768419,
-                    0.35889585616853298]
+        expected =\
+            [5.8813080107727442, 8.9771372790941797,
+            8.9153072947470822, 8.1583747730768419,
+            0.35889585616853298]
 
         self.assertItemsEqual(actual, expected)
 
@@ -62,9 +69,10 @@ class BoxCoxTest(sparktk_test.SparkTKTestCase):
         self.frame.box_cox("y", -1)
 
         actual = self.frame.to_pandas()["y_lambda_-1.0"].tolist()
-        expected = [0.82996979614597488, 0.88860591423406388,
-                    0.88783336715839256, 0.87742656744575354,
-                    -1.7863236167608822]
+        expected =\
+            [0.82996979614597488, 0.88860591423406388,
+            0.88783336715839256, 0.87742656744575354,
+            -1.7863236167608822]
 
         self.assertItemsEqual(actual, expected)
 
